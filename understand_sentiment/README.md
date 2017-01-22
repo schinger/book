@@ -1,4 +1,7 @@
 # 情感分析
+
+本教程源代码目录在[book/understand_sentiment](https://github.com/PaddlePaddle/book/tree/develop/understand_sentiment)， 初次使用请参考PaddlePaddle[安装教程](http://www.paddlepaddle.org/doc_cn/build_and_install/index.html)。
+
 ## 背景介绍
 在自然语言处理中，情感分析一般是指判断一段文本所表达的情绪状态。其中，一段文本可以是一个句子，一个段落或一个文档。情绪状态可以是两类，如（正面，负面），（高兴，悲伤）；也可以是三类，如（积极，消极，中性）等等。情感分析的应用场景十分广泛，如把用户在购物网站（亚马逊、天猫、淘宝等）、旅游网站、电影评论网站上发表的评论分成正面评论和负面评论；或为了分析用户对于某一产品的整体使用感受，抓取产品的用户评论并进行情感分析等等。表格1展示了对电影评论进行情感分析的例子：
 
@@ -23,7 +26,7 @@
 
 卷积神经网络主要由卷积（convolution）和池化（pooling）操作构成，其应用及组合方式灵活多变，种类繁多。本小结我们以一种简单的文本分类卷积神经网络为例进行讲解\[[1](#参考文献)\]，如图1所示：
 <p align="center">
-<img src="image/text_cnn.png" width = "90%" height = "90%" align="center"/><br/>
+<img src="image/text_cnn.png" width = "80%" align="center"/><br/>
 图1. 卷积神经网络文本分类模型
 </p>
 假设待处理句子的长度为$n$，其中第$i$个词的词向量（word embedding）为$x_i\in\mathbb{R}^k$，$k$为维度大小。  
@@ -46,7 +49,7 @@ $$\hat c=max(c)$$
 ### 循环神经网络（RNN）
 循环神经网络是一种能对序列数据进行精确建模的有力工具。实际上，循环神经网络的理论计算能力是图灵完备的\[[4](#参考文献)\]。自然语言是一种典型的序列数据（词序列），近年来，循环神经网络及其变体（如long short term memory\[[5](#参考文献)\]等）在自然语言处理的多个领域，如语言模型、句法解析、语义角色标注（或一般的序列标注）、语义表示、图文生成、对话、机器翻译等任务上均表现优异甚至成为目前效果最好的方法。
 <p align="center">
-<img src="image/rnn.png" width = "70%" height = "70%" align="center"/><br/>
+<img src="image/rnn.png" width = "60%" align="center"/><br/>
 图2. 循环神经网络按时间展开的示意图
 </p>
 循环神经网络按时间展开后如图2所示：在第$t$时刻，网络读入第$t$个输入$x_t$（向量表示）及前一时刻隐层的状态值$h_{t-1}$（向量表示，$h_0$一般初始化为$0$向量），计算得出本时刻隐层的状态值$h_t$，重复这一步骤直至读完所有输入。如果将循环神经网络所表示的函数记为$f$，则其公式可表示为：
@@ -75,7 +78,7 @@ h_t & = o_t\odot tanh(c_t)\\\\
 其中，$i_t, f_t, c_t, o_t$分别表示输入门，遗忘门，记忆单元及输出门的向量值，带角标的$W$及$b$为模型参数，$tanh$为双曲正切函数，$\odot$表示逐元素（elementwise）的乘法操作。输入门控制着新输入进入记忆单元$c$的强度，遗忘门控制着记忆单元维持上一时刻值的强度，输出门控制着输出记忆单元的强度。三种门的计算方式类似，但有着完全不同的参数，它们各自以不同的方式控制着记忆单元$c$，如图3所示：
 <p align="center">
 <img src="image/lstm.png" width = "65%" height = "65%" align="center"/><br/>
-图3. 时刻$t$的LSTM\[[7](#参考文献)\]
+图3. 时刻$t$的LSTM [7]
 </p>
 LSTM通过给简单的循环神经网络增加记忆及控制门的方式，增强了其处理远距离依赖问题的能力。类似原理的改进还有Gated Recurrent Unit (GRU)\[[8](#参考文献)\]，其设计更为简洁一些。**这些改进虽然各有不同，但是它们的宏观描述却与简单的循环神经网络一样（如图2所示），即隐状态依据当前输入及前一时刻的隐状态来改变，不断地循环这一过程直至输入处理完毕：**
 
@@ -87,7 +90,7 @@ $$ h_t=Recrurent(x_t,h_{t-1})$$
 
 如图4所示（以三层为例），奇数层LSTM正向，偶数层LSTM反向，高一层的LSTM使用低一层LSTM及之前所有层的信息作为输入，对最高层LSTM序列使用时间维度上的最大池化即可得到文本的定长向量表示（这一表示充分融合了文本的上下文信息，并且对文本进行了深层次抽象），最后我们将文本表示连接至softmax构建分类模型。
 <p align="center">
-<img src="image/stacked_lstm.jpg"><br/>
+<img src="image/stacked_lstm.jpg" width=450><br/>
 图4. 栈式双向LSTM用于文本分类
 </p>
 ## 数据准备
@@ -468,3 +471,6 @@ predicting label is pos
 7. Graves A. [Generating sequences with recurrent neural networks](http://arxiv.org/pdf/1308.0850)[J]. arXiv preprint arXiv:1308.0850, 2013.
 8. Cho K, Van Merriënboer B, Gulcehre C, et al. [Learning phrase representations using RNN encoder-decoder for statistical machine translation](http://arxiv.org/pdf/1406.1078)[J]. arXiv preprint arXiv:1406.1078, 2014.
 9. Zhou J, Xu W. [End-to-end learning of semantic role labeling using recurrent neural networks](http://www.aclweb.org/anthology/P/P15/P15-1109.pdf)[C]//Proceedings of the Annual Meeting of the Association for Computational Linguistics. 2015.
+
+<br/>
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" href="http://purl.org/dc/dcmitype/Text" property="dct:title" rel="dct:type">本教程</span> 由 <a xmlns:cc="http://creativecommons.org/ns#" href="http://book.paddlepaddle.org" property="cc:attributionName" rel="cc:attributionURL">PaddlePaddle</a> 创作，采用 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享 署名-非商业性使用-相同方式共享 4.0 国际 许可协议</a>进行许可。
